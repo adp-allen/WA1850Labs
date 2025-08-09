@@ -1,0 +1,89 @@
+## Lab 7 - Spring Transactions README
+
+```markdown
+# Spring Fundamentals, Transaction Management - MODULE 7
+
+Spring provides a declarative approach to transaction management, separating implementation from demarcation. This allows your code to enjoy the benefits of transaction management without being coupled to a specific implementation.
+
+Within the codebase you will find ordered TODO comments that describe what actions to take for each step. Solution code is provided for you in a separate folder.
+
+## Setup
+
+### Copy the Starter Project
+1. Copy the folder: `LabFiles/spring-transactions/starter/spring-transactions`
+2. Paste it into your LabWork directory
+3. When done, you should have: `LabWork/spring-transactions`
+4. Use your IDE to open `C:\LabWork\spring-transactions`
+
+## Configure the PlatformTransactionManager
+
+**TODO-01:** Open `src/main/java/com.example.Config.java`. Add an annotation to this class to enable Spring transaction management:
+
+```java
+@EnableTransactionManagement
+@Configuration
+@PropertySource("classpath:app.properties")
+@ComponentScan("com.example")
+public class Config {
+    ...
+}
+This annotation tells Spring to look for beans with @Transactional annotations and create proxies to add transactional behavior to these beans.
+TODO-02: Define a PlatformTransactionManager bean:
+java@Bean
+public PlatformTransactionManager transactionManager(DataSource dataSource) {
+    return new DataSourceTransactionManager(dataSource);
+}
+Make the PurchaseServiceImpl Transactional
+TODO-03: Open src/main/java/com.example.service.PurchaseServiceImpl.java. Make the methods in this bean transactional:
+java@Service
+@Transactional
+public class PurchaseServiceImpl implements PurchaseService {
+    ...
+}
+When the Spring ApplicationContext starts, it will recognize the @Transactional annotation and create a proxy around the PurchaseServiceImpl bean. This proxy will intercept method calls, adding transactional behavior (begin, commit, rollback) to each method.
+Test the Transactional Behavior
+TODO-04: Open src/test/java/com.example.service.PurchaseServiceImplTests.java. Annotate this class to make it a Spring test class:
+java@SpringJUnitConfig(Config.class)
+public class PurchaseServiceImplTests {
+    ...
+}
+TODO-05: Have Spring inject a PurchaseService into this class:
+java@Autowired PurchaseService purchaseService;
+TODO-06: Have Spring inject the PlatformTransactionManager into this class:
+java@Autowired PlatformTransactionManager transactionManager;
+TODO-07: Remove the @Disabled annotation from the testSavePurchase method. Observe the code that starts a transaction:
+java// Manually start a transaction.
+TransactionStatus status =
+    transactionManager.getTransaction(
+        new DefaultTransactionDefinition());
+TODO-08: Observe the test logic:
+javaPurchase p = new Purchase("Praveen", new Date(), "lava lamp");
+TODO-09: Call the method on the PurchaseService to save the Purchase object:
+javapurchaseService.savePurchase(p);
+TODO-10: Observe the rollback code:
+javatransactionManager.rollback(status);
+Consider: will this rollback affect the previous save operation or not? The @Transactional annotation on PurchaseServiceImpl adds transactional behavior to each method. However, our test logic has already started a transaction before calling savePurchase(). Will this result in one single transaction that is rolled back, or will savePurchase() have a separate transaction?
+TODO-11: Within the try/catch block, call the findPurchase() method:
+javaretrievedPurchase =
+    purchaseService.findPurchase(
+        p.getCustomerName(),
+        p.getPurchaseDate());
+TODO-12: Organize imports and save your work. Run this test. Initially it will FAIL.
+The rollback logic has rolled back the Purchase object that was saved. The default propagation behavior of @Transactional methods is required. This means if a transaction already exists, the method will join it. The single transaction was rolled back by the test logic.
+Change the Transaction Propagation Behavior
+TODO-13: Return to src/main/java/com.example.service.PurchaseServiceImpl.java. Override the transaction propagation behavior on the savePurchase() method:
+java@Transactional(propagation = Propagation.REQUIRES_NEW)
+public void savePurchase(Purchase purchase) {
+    purchaseDAO.save(purchase);
+}
+Now a new transaction will begin when this method is called, regardless of whether one is already in progress. The inner transaction will be committed or rolled back independently of any outer transaction.
+TODO-14: Organize imports, save your work. Return to the previous test. Run it again. It should pass.
+The savePurchase method is now in its own transaction. The rollback logic in the test will not affect it.
+Review
+In this lab we learned:
+
+How to enable Spring transaction management
+How to define a PlatformTransactionManager bean
+How to make methods in a bean transactional
+How to manually control transactions in a test
+How to change the transaction propagation behavior of a method

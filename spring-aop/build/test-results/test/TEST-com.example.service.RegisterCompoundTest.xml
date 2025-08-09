@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.service.RegisterCompoundTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2025-08-09T06:50:42.315Z" hostname="Mac.attlocal.net" time="0.015">
+  <properties/>
+  <testcase name="testRegister()" classname="com.example.service.RegisterCompoundTest" time="0.015"/>
+  <system-out><![CDATA[The computed total including tax is: 108.50
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

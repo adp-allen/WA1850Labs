@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.service.RegisterTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2025-08-09T07:22:37.796Z" hostname="Mac.attlocal.net" time="0.0">
+  <properties/>
+  <testcase name="testComputeTotal()" classname="com.example.service.RegisterTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Aug 09, 2025 3:22:37 AM org.hibernate.jpa.internal.util.LogHelper logPersistenceUnitInformation
+INFO: HHH000204: Processing PersistenceUnitInfo [name: default]
+Aug 09, 2025 3:22:37 AM org.hibernate.cache.internal.RegionFactoryInitiator initiateService
+INFO: HHH000026: Second-level cache disabled
+Aug 09, 2025 3:22:37 AM org.springframework.orm.jpa.persistenceunit.SpringPersistenceUnitInfo addTransformer
+INFO: No LoadTimeWeaver setup: ignoring JPA class transformer
+Aug 09, 2025 3:22:37 AM org.hibernate.engine.jdbc.dialect.internal.DialectFactoryImpl constructDialect
+WARN: HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+Aug 09, 2025 3:22:37 AM org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator initiateService
+INFO: HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+Aug 09, 2025 3:22:37 AM org.springframework.orm.jpa.AbstractEntityManagerFactoryBean buildNativeEntityManagerFactory
+INFO: Initialized JPA EntityManagerFactory for persistence unit 'default'
+]]></system-err>
+</testsuite>

@@ -1,0 +1,152 @@
+## Lab 6 - Spring JDBC README
+
+```markdown
+# Spring Fundamentals, JDBC Support - MODULE 6
+
+Java Database Connectivity (JDBC) is one of the essential parts of the JDK, used widely when working with relational databases. However, it is a very low-level API, forcing developers to write redundant, error-prone code with checked Exceptions. The Spring framework elevates your level of productivity with the JdbcClient.
+
+Within the codebase you will find ordered TODO comments that describe what actions to take for each step. Solution code is provided for you in a separate folder.
+
+If you have time, there is an optional challenge working with Mockito to test the service layer.
+
+## Setup
+
+### Copy the Starter Project
+1. Copy the folder: `LabFiles/spring-jdbc/starter/spring-jdbc`
+2. Paste it into your LabWork directory
+3. When done, you should have: `LabWork/spring-jdbc`
+
+### Open the project
+Use your IDE to open `C:\LabFiles\spring-jdbc`
+
+**TODO 01:** Open `build.gradle`. Notice there are two new dependencies added to working with databases:
+- `org.hsqldb:hsqldb`
+- `org.springframework:spring-jdbc`
+
+HSQLDB is an in-memory database ideal for local testing. Spring JDBC is the Spring module that provides support for JDBC.
+
+## Define Database and JdbcClient
+
+**TODO 02:** Open `src/main/java/com/example/Config.java`. Define a DataSource bean:
+
+```java
+@Bean
+public DataSource dataSource() {
+    return new EmbeddedDatabaseBuilder()
+        .setType(EmbeddedDatabaseType.HSQL)
+        .addScript("classpath:schema.sql")
+        .addScript("classpath:data.sql")
+        .build();
+}
+TODO 03: Define a JdbcClient bean:
+java@Bean
+public JdbcClient jdbcClient(DataSource dataSource) {
+    return JdbcClient.create(dataSource);
+}
+Implement the PurchaseDaoImpl
+TODO 04: Open src/main/java/com/example/dao/PurchaseDaoImpl.java. Annotate it as a Spring bean:
+java@Repository
+public class PurchaseDaoImpl implements PurchaseDao {
+    ...
+}
+TODO 05: Have Spring inject the JdbcClient into this class:
+java@Autowired JdbcClient jdbcClient;
+TODO 06: Implement the getAllPurchases() method:
+javapublic List<Purchase> getAllPurchases() {
+    String sql = "SELECT * FROM PURCHASE";
+    return jdbcClient
+        .sql(sql)
+        .query(Purchase.class)
+        .list();
+}
+TODO 07: Implement the getPurchase() method:
+javapublic Purchase getPurchase(int id) {
+    String sql = "SELECT * FROM PURCHASE WHERE ID = ?";
+    return jdbcClient
+        .sql(sql)
+        .param(id)
+        .query(Purchase.class)
+        .single();
+}
+TODO 08: Implement the savePurchase() method:
+javapublic void savePurchase(Purchase purchase) {
+    String sql = "insert into PURCHASE (CUSTOMERNAME, PRODUCT, PURCHASEDATE) values(?,?,?)";
+    jdbcClient
+        .sql(sql)
+        .param(purchase.getCustomerName())
+        .param(purchase.getProduct())
+        .param(purchase.getPurchaseDate())
+        .update();
+}
+Implement the PurchaseServiceImpl
+TODO 09: Open src/main/java/com/example/service/PurchaseServiceImpl.java. Annotate it as a Spring bean:
+java@Service
+public class PurchaseServiceImpl implements PurchaseService {
+    ...
+}
+TODO 10: Have Spring inject the PurchaseDao into this class:
+java@Autowired PurchaseDao purchaseDAO;
+Implement the PurchaseDaoImplTests
+TODO 11: Open src/test/java/com/example/dao/PurchaseDaoImplTests.java. Annotate it as a Spring test class:
+java@SpringJUnitConfig(Config.class)
+public class PurchaseDaoImplTests {
+    ...
+}
+TODO 12: Have Spring inject a PurchaseDao into this class:
+java@Autowired PurchaseDao dao;
+TODO 13: Examine the findAllPurchases() test method and remove the @Disabled annotation. Run the test.
+TODO 14: Implement the getPurchase() test method:
+java@Test
+public void getPurchase() {
+    Purchase p = dao.getPurchase(2);
+    // Make sure the purchase has its properties mapped:
+    assertThat(p).isNotNull();
+    assertThat(p.getId()).isNotNull();
+    assertThat(p.getCustomerName()).isNotNull();
+    assertThat(p.getCustomerName()).isEqualTo("Paul");
+    assertThat(p.getProduct()).isEqualTo("Football");
+}
+TODO 15: Implement the savePurchase() test method:
+java@Test
+public void savePurchase() {
+    Purchase p = new Purchase();
+    p.setCustomerName("Sample");
+    p.setProduct("Sample Product");
+    p.setPurchaseDate( new Date());
+    dao.savePurchase(p);
+    Purchase newPurchase = dao.getPurchase(p.getCustomerName(),p.getPurchaseDate());
+    // Make sure the purchase was saved properly:
+    assertThat(newPurchase).isNotNull();
+    assertThat(newPurchase.getId()).isNotNull();
+    assertThat(newPurchase.getCustomerName()).isNotNull();
+    assertThat(newPurchase.getCustomerName()).isEqualTo(p.getCustomerName());
+    assertThat(newPurchase.getProduct()).isEqualTo(p.getProduct());
+}
+TODO-16: Organize your imports, save your work. Run this test class. All tests should pass.
+OPTIONAL: Test PurchaseServiceImpl using Mockito
+TODO-17: Open src/test/java/com/example/service/PurchaseServiceImplTests.java. Annotate it as a Mockito test class:
+java@ExtendWith(MockitoExtension.class)
+public class PurchaseServiceImplTests {
+    ...
+}
+TODO-18: Define a Mock object:
+java@Mock PurchaseDao purchaseDao;
+TODO-19: Define a variable with @InjectMocks:
+java@InjectMocks PurchaseServiceImpl purchaseService;
+TODO-20: Within the testFindAllPurchases(), use Mockito's when() method:
+javawhen(purchaseDao.getAllPurchases()).thenReturn(expectedPurchases);
+TODO-21: Call the method under test:
+javaList<Purchase> result = purchaseService.findAllPurchases();
+TODO-22: Test the result:
+javaassertThat(result).containsExactlyElementsOf(expectedPurchases);
+TODO-23: Verify that the mock had its method called:
+javaverify(purchaseDao).getAllPurchases();
+TODO-24: Organize your imports, save your work, run this test class.
+Review
+In this lab we learned:
+
+How to configure a DataSource bean using an in-memory database
+How to define a JdbcClient bean
+How to use the JdbcClient to perform SELECT and INSERT operations on a database
+How to test the DAO
+How to use Mockito to test the service layer

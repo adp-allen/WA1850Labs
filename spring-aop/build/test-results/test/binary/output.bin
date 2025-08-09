@@ -1,0 +1,7 @@
+?The com.example.dao.PurchaseDao.getPurchase method was called.
+&Retrieved purchase: Sample Purchase 1
+CThe com.example.dao.PurchaseDao.getAllPurchases method was called.
+Found 2 purchases
+Saved new purchase
+,The computed total including tax is: 108.50
+,The computed total including tax is: 106.00

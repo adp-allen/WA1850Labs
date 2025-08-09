@@ -1,0 +1,112 @@
+# Spring Fundamentals, Aspect Oriented Programming - MODULE 5
+
+One of the most fascinating capabilities of the Spring framework is the ability to easily implement Aspect Oriented Programming (AOP). In this lab, we will learn how to use AOP in Spring.
+
+Within the codebase you will find ordered TODO comments that describe what actions to take for each step. By finding all files containing TODO, and working on the steps in numeric order, it is possible to complete this exercise without looking at the instructions.
+
+Solution code is provided for you in a separate folder, so you can compare your work if needed. For maximum benefit, try to complete the lab without looking at the solution.
+
+## Setup
+
+### Copy the Starter Project
+1. Copy the folder: `LabFiles/spring-aop/starter/spring-aop`
+2. Paste it into your working LabWork directory
+3. When done, you should have: `LabWork/spring-aop`
+
+### Open the project
+Use your IDE to open `C:\LabWork\spring-aop`
+
+**TODO 01:** Open `build.gradle`. Notice there are three new dependencies added to support AOP:
+- `org.aspectj:aspectjweaver`
+- `org.springframework:spring-aop`
+- `org.springframework:spring-aspects`
+
+Spring uses AspectJ internally for some of its features, such as pointcut syntax.
+
+## Enable Aspect Oriented Programming
+
+**TODO-02:** Open `src/main/java/com.example.Config.java`. Add an annotation to this configuration class to enable AspectJ proxying:
+
+```java
+@EnableAspectJAutoProxy
+@Configuration
+@PropertySource("classpath:app.properties")
+@ComponentScan("com.example")
+public class Config {
+    ...
+}
+The @EnableAspectJAutoProxy annotation serves as a master switch to enable AOP capability within a Spring application.
+Build the LoggingAspect
+TODO-03: Open src/main/java/com.example.aspect.LoggingAspect.java. Annotate this class as an aspect and a component:
+java@Aspect
+@Component
+public class LoggingAspect {
+    ...
+}
+TODO-04: Find the logActivity() method. Annotate this method to execute before other methods are called:
+java@Before("execution(* com.example.dao.*.get*(..))")
+public void logActivity(JoinPoint joinPoint) {
+    ...
+}
+The pointcut expression:
+
+execution indicates we wish to select a method execution
+The first wildcard * matches any return type
+com.example.dao.* matches any class in the com.example.dao package
+get* matches any method starting with "get"
+(..) matches any number of parameters; zero or more
+
+TODO-05: Alter the line of code defining "methodName". Use the joinPoint parameter to get the class name and method name:
+javaString methodName =
+    joinPoint.getSignature().getDeclaringTypeName() +
+    "." +
+    joinPoint.getSignature().getName();
+System.out.println("The " + methodName + " method was called.");
+TODO-06: Organize your imports, save your work.
+Test the LoggingAspect
+TODO-07: Open src/test/java/com.example.dao.PurchaseDaoImplTests.java. Annotate this class to make it a Spring test class:
+java@SpringJUnitConfig(Config.class)
+public class PurchaseDaoImplTests {
+    ...
+}
+TODO-08: Inject a PurchaseDao object:
+java@Autowired PurchaseDao dao;
+TODO-09: Organize imports, save your work.
+Run the tests. You should see output from the LoggingAspect class in the console:
+The com.example.dao.PurchaseDao.getPurchase method was called.
+The com.example.dao.PurchaseDao.getAllPurchases method was called.
+OPTIONAL: Build the StopWatchAspect
+TODO-10: Open src/main/java/com.example.aspect.StopwatchAspect.java. Annotate this class as an aspect and a component:
+java@Aspect
+@Component
+public class StopwatchAspect {
+    ...
+}
+TODO-11: Find the recordTime() method. Annotate this method with @Around advice:
+java@Around("execution(* com.example.dao.*.save*(..))")
+public Object recordTime(ProceedingJoinPoint joinPoint) throws Throwable {
+    ...
+}
+TODO-12: Within the advice method, instantiate a new Stopwatch object and call its start() method:
+javaStopwatch stopwatch = new Stopwatch();
+stopwatch.start();
+TODO-13: Within the try/catch block, call the target method:
+javaresult = joinPoint.proceed();
+TODO-14: Within the finally block, stop the stopwatch and display the elapsed time:
+javastopwatch.stop();
+stopwatch.displayElapsedTime(methodName);
+TODO-15: Organize imports, save your work.
+Test the StopwatchAspect
+TODO-16: Return to src/test/java/com.example.dao.PurchaseDaoImplTests.java. Find the savePurchase() method. Remove the @Disabled annotation. Run the test.
+Expected output should look similar to:
+The com.example.dao.PurchaseDao.getPurchase method was called.
+The com.example.dao.PurchaseDao.getAllPurchases method was called.
+Elapsed time for com.example.dao.PurchaseDao.savePurchase is 2.165 seconds
+Review
+In this lab we learned:
+
+How to enable Aspect Oriented Programming in Spring
+How to create an aspect
+How to create pointcut expressions
+How to create advice methods
+How to test aspects
