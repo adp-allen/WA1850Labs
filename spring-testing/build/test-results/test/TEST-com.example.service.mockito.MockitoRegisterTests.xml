@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.service.mockito.MockitoRegisterTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2025-08-09T00:42:22.520Z" hostname="Mac.attlocal.net" time="0.0">
+  <properties/>
+  <testcase name="testRegister()" classname="com.example.service.mockito.MockitoRegisterTests" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
